@@ -1,0 +1,32 @@
+name: Aktualizuj dane PESEL
+
+on:
+  schedule:
+    - cron: "17 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python scripts/update_data.py
+      - name: Zapisz nowe dane
+        run: |
+          if git diff --quiet -- data/names.json; then
+            echo "Dane bez zmian."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/names.json
+          git commit -m "Aktualizacja danych PESEL"
+          git push
