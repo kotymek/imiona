@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Najpopularniejsze imiona kobiet i mężczyzn w Polsce według aktualnych danych rejestru PESEL.">
+  <meta name="theme-color" content="#f3efe7">
+  <title>Imiona w Polsce — ranking PESEL</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="Strona główna kotymek">kotymek<span>.</span></a>
+    <a class="source-link" href="https://dane.gov.pl/pl/dataset/1667,lista-imion-wystepujacych-w-rejestrze-pesel-osoby-zyjace" target="_blank" rel="noreferrer">
+      Źródło: dane.gov.pl <span aria-hidden="true">↗</span>
+    </a>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="eyebrow"><span></span> Rejestr PESEL · osoby żyjące</div>
+      <h1>Jakie imiona nosi <em>Polska?</em></h1>
+      <p class="lead">Przeszukuj i porównuj wszystkie pierwsze imiona kobiet i mężczyzn występujące w rejestrze PESEL.</p>
+
+      <div class="hero-stats" aria-label="Podsumowanie danych">
+        <div><strong id="total-people">—</strong><span>osób w zestawieniu</span></div>
+        <div><strong id="total-names">—</strong><span>pozycji na liście</span></div>
+        <div><strong id="data-date">—</strong><span>stan danych</span></div>
+      </div>
+    </section>
+
+    <section class="ranking" aria-labelledby="ranking-title">
+      <div class="section-heading">
+        <div>
+          <p class="kicker">Pełny ranking</p>
+          <h2 id="ranking-title">Imiona w rejestrze</h2>
+        </div>
+        <p id="result-count" aria-live="polite">Wczytywanie danych…</p>
+      </div>
+
+      <div class="controls">
+        <label class="search">
+          <span class="sr-only">Szukaj imienia</span>
+          <span aria-hidden="true">⌕</span>
+          <input id="search" type="search" placeholder="Wpisz imię…" autocomplete="off">
+        </label>
+
+        <div class="segmented" role="group" aria-label="Filtr płci">
+          <button class="active" type="button" data-gender="all">Wszyscy</button>
+          <button type="button" data-gender="K">Kobiety</button>
+          <button type="button" data-gender="M">Mężczyźni</button>
+        </div>
+
+        <label class="select-wrap">
+          <span class="sr-only">Sortowanie</span>
+          <select id="sort">
+            <option value="count-desc">Najpopularniejsze</option>
+            <option value="count-asc">Najrzadsze</option>
+            <option value="name-asc">Alfabetycznie A–Z</option>
+            <option value="name-desc">Alfabetycznie Z–A</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Imię</th>
+              <th scope="col">Płeć</th>
+              <th scope="col" class="number">Liczba osób</th>
+              <th scope="col" class="share">Udział</th>
+            </tr>
+          </thead>
+          <tbody id="names-body">
+            <tr><td colspan="5" class="loading">Przygotowuję ranking…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <nav class="pagination" aria-label="Stronicowanie wyników">
+        <button id="prev" type="button" aria-label="Poprzednia strona">←</button>
+        <span id="page-info">—</span>
+        <button id="next" type="button" aria-label="Następna strona">→</button>
+      </nav>
+    </section>
+  </main>
+
+  <footer>
+    <p>Dane pochodzą z publicznego rejestru PESEL i obejmują osoby żyjące.</p>
+    <p>Projekt <a href="https://kotymek.github.io/">kotymek.github.io</a></p>
+  </footer>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
