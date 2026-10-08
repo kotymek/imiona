@@ -13,6 +13,7 @@ from openpyxl import load_workbook
 API_URL = "https://api.dane.gov.pl/1.4/datasets/1667/resources?per_page=100"
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "data" / "names.json"
+HISTORY = OUTPUT.parent / "history"
 
 
 def request(url: str) -> bytes:
@@ -61,6 +62,7 @@ def repair_encoding(value: str) -> str:
 def main() -> None:
     data_date, resources = latest_resources()
     names = [entry for resource in resources for entry in rows(resource)]
+    validate_names(names)
     names.sort(key=lambda item: (-item["count"], item["name"], item["gender"]))
     payload = {
         "date": data_date,
@@ -69,8 +71,34 @@ def main() -> None:
         "names": names,
     }
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+    if OUTPUT.exists():
+        archive(json.loads(OUTPUT.read_text(encoding="utf-8")))
+    archive(payload)
     OUTPUT.write_text(json.dumps(payload, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     print(f"Zapisano {len(names)} pozycji z dnia {data_date}.")
+
+
+def validate_names(names: list[dict]) -> None:
+    if not names or {item["gender"] for item in names} != {"K", "M"}:
+        raise ValueError("Brak kompletu danych dla obu płci")
+    keys = [(item["gender"], item["name"]) for item in names]
+    if len(set(keys)) != len(keys):
+        raise ValueError("Powtórzone pary imię–płeć")
+    if any(not item["name"] or item["count"] <= 0 for item in names):
+        raise ValueError("Nieprawidłowe imię lub liczebność")
+
+
+def archive(payload: dict) -> None:
+    data_date = payload["date"]
+    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", data_date):
+        raise ValueError("Nieprawidłowa data archiwum")
+    HISTORY.mkdir(parents=True, exist_ok=True)
+    snapshot = {"date": data_date, "names": payload["names"]}
+    (HISTORY / f"{data_date}.json").write_text(
+        json.dumps(snapshot, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    dates = sorted(path.stem for path in HISTORY.glob("????-??-??.json"))
+    (HISTORY / "index.json").write_text(
+        json.dumps([{"date": value} for value in dates]), encoding="utf-8")
 
 
 if __name__ == "__main__":

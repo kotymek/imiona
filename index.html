@@ -22,9 +22,16 @@
   <main>
     <section class="hero">
       <div class="eyebrow"><span></span> Rejestr PESEL · osoby żyjące</div>
-      <h1>Jakie imiona noszą <em>mieszkańcy Polski?</em></h1>
-      <p class="lead">wszystkie pierwsze imiona występujące w rejestrze PESEL</p>
+      <h1>Jak wyjątkowe jest <em>twoje imię?</em></h1>
+      <p class="lead">Sprawdź popularność pierwszych imion osób żyjących w rejestrze PESEL.</p>
 
+        <label class="search">
+          <span class="sr-only">Szukaj imienia</span>
+          <span aria-hidden="true">⌕</span>
+          <input id="search" type="search" placeholder="Wpisz imię, np. Łukasz…" aria-describedby="search-hint" autocomplete="off">
+        </label>
+
+      <p id="search-hint" class="hint">Możesz pisać bez polskich znaków. Każdy zapis imienia pozostaje osobną pozycją.</p>
       <div class="hero-stats" aria-label="Podsumowanie danych">
         <div><strong id="total-people">—</strong><span>osób w zestawieniu</span></div>
         <div><strong id="total-names">—</strong><span>pozycji na liście</span></div>
@@ -42,12 +49,6 @@
       </div>
 
       <div class="controls">
-        <label class="search">
-          <span class="sr-only">Szukaj imienia</span>
-          <span aria-hidden="true">⌕</span>
-          <input id="search" type="search" placeholder="Wpisz imię…" autocomplete="off">
-        </label>
-
         <div class="segmented" role="group" aria-label="Filtr płci">
           <button class="active" type="button" data-gender="all">Wszyscy</button>
           <button type="button" data-gender="K">Kobiety</button>
@@ -65,19 +66,26 @@
         </label>
       </div>
 
+      <div class="extra-controls">
+        <label>Na literę <select id="letter"><option value="">Wszystkie</option></select></label>
+        <label><input type="checkbox" id="rare"> Do 100 osób</label>
+        <label><input type="checkbox" id="short"> Do 4 znaków</label>
+        <button type="button" id="reset">Wyczyść filtry</button>
+      </div>
+      <p class="hint">Miejsce w rankingu ogólnym nie zmienia się po wyszukaniu lub filtrowaniu. Remisy mają wspólne miejsce.</p>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th scope="col">#</th>
+              <th scope="col">Miejsce</th>
               <th scope="col">Imię</th>
               <th scope="col">Płeć</th>
               <th scope="col" class="number">Liczba osób</th>
-              <th scope="col" class="share">Udział</th>
+              <th scope="col" class="share">Udział w zestawieniu</th><th scope="col"><span class="sr-only">Porównanie</span></th>
             </tr>
           </thead>
           <tbody id="names-body">
-            <tr><td colspan="5" class="loading">Przygotowuję ranking…</td></tr>
+            <tr><td colspan="6" class="loading">Przygotowuję ranking…</td></tr>
           </tbody>
         </table>
       </div>
@@ -87,7 +95,33 @@
         <span id="page-info">—</span>
         <button id="next" type="button" aria-label="Następna strona">→</button>
       </nav>
+      <div class="page-options">
+        <label>Wyników na stronę <select id="per-page"><option>25</option><option selected>50</option><option>100</option></select></label>
+        <form id="page-form"><label>Przejdź do strony <input id="page-number" type="number" min="1" value="1" required></label><button>Przejdź</button></form>
+      </div>
     </section>
+    <section id="compare-panel" class="comparison panel" aria-labelledby="comparison-title">
+      <p class="kicker">Obok siebie</p><h2 id="comparison-title">Porównaj imiona</h2>
+      <p class="hint">Wybierz od 2 do 4 imion przyciskiem „+” w tabeli. Długość słupków pokazuje liczbę osób względem najczęstszego wybranego imienia.</p>
+      <p id="comparison-status" role="status"></p><div id="comparison"></div>
+    </section>
+    <details class="panel methodology">
+      <summary>Jak czytać te dane?</summary>
+      <p>Zestawienie obejmuje pierwsze imiona osób oznaczonych jako żyjące w rejestrze PESEL. Nie jest spisem mieszkańców Polski ani rankingiem imion nadawanych noworodkom. Suma pozycji nie jest liczbą osób aktualnie mieszkających w kraju.</p>
+      <p>Jedna pozycja to zapis imienia i płeć w danych źródłowych. „Łukasz” i „Lukasz” pozostają osobnymi pozycjami. Wyszukiwanie bez znaków diakrytycznych pomaga je znaleźć, ale nie sumuje ich liczebności.</p>
+      <p>Udział to liczba osób przy danym imieniu podzielona przez sumę liczebności wszystkich pozycji zestawienia. Filtry nie zmieniają tej podstawy. Ranking jest malejący według liczby osób; przy remisie stosujemy miejsca 1, 1, 3.</p>
+      <p>Stan danych: <strong id="method-date">—</strong>. Ostatnie pomyślne pobranie: <strong id="checked-date">—</strong>. Cotygodniowe sprawdzanie źródła nie oznacza, że urząd publikuje nowe dane co tydzień.</p>
+      <p>Historia obejmuje stany zachowane przez ten projekt. Zmiana liczebności nie oznacza liczby nowo narodzonych dzieci. Brak imienia w danym pliku nie jest traktowany jako zero.</p>
+    </details>
+    <a id="compare-tray" class="compare-tray" href="#compare-panel" hidden></a>
+    <dialog id="name-dialog" aria-labelledby="name-title">
+      <button id="close-dialog" class="close" aria-label="Zamknij kartę imienia">×</button>
+      <p class="kicker">Twoje imię w liczbach</p><h2 id="name-title"></h2>
+      <div id="name-detail"></div>
+      <div class="dialog-actions"><button id="detail-compare">Dodaj do porównania</button><button id="copy-link">Kopiuj link</button></div>
+      <p id="copy-status" role="status"></p>
+      <label class="share-link">Link do tego imienia<input id="share-url" readonly></label>
+    </dialog>
   </main>
 
   <footer>
@@ -95,6 +129,7 @@
     <p>Projekt <a href="https://kotymek.github.io/">kotymek.github.io</a></p>
   </footer>
 
+  <script src="core.js" defer></script>
   <script src="app.js" defer></script>
 </body>
 </html>
